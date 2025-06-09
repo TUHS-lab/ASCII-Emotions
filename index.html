@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ASCII Emotions</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎭</text></svg>">
+    <style>
+        /* Enhanced minimalist style */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            width: 100vw;
+            overflow-x: hidden;
+            touch-action: pan-y;
+            position: relative;
+            padding-bottom: 60px; /* Добавлено для футера */
+        }
+
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            padding: 15px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .sound-toggle {
+            background: transparent;
+            color: white;
+            border: 1px solid white;
+            padding: 8px 20px;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            flex-grow: 1;
+            padding: 20px 0;
+            overflow: hidden;
+        }
+
+        .ascii-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 40px 0 30px;
+            flex-grow: 1;
+        }
+
+        .ascii-art {
+            white-space: pre;
+            text-align: center;
+            animation: float 6s ease-in-out infinite;
+            filter: drop-shadow(0 0 15px rgba(255,255,255,0.5));
+            cursor: pointer;
+            position: relative;
+            z-index: 2;
+            transform-origin: center;
+            font-size: 18px;
+            line-height: 18px;
+            letter-spacing: 3px;
+            max-width: 100%;
+        }
+
+        /* Keyframe animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(5deg); }
+            75% { transform: rotate(-5deg); }
+        }
+
+        @keyframes color-shift {
+            0% { text-shadow: 0 0 8px #fff; }
+            50% { text-shadow: 0 0 15px #fff; }
+            100% { text-shadow: 0 0 8px #fff; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+            max-width: 800px;
+            padding: 30px 20px;
+            margin: 20px 0;
+        }
+
+        button {
+            background: transparent;
+            color: white;
+            border: 1px solid white;
+            padding: 12px 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 120px;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background: white;
+            color: black;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        /* Different character states */
+        .happy { animation: wave 2s infinite; }
+        .dancing { animation: float 0.8s infinite alternate, shake 0.5s infinite; }
+        .sleeping { animation: blink 3s infinite; }
+        .glowing { animation: color-shift 2s infinite; }
+        .angry { animation: shake 0.2s infinite; }
+        .spinning { animation: spin 2s infinite linear; }
+        .surprised { animation: pulse 1s infinite; }
+        .love { animation: float 3s infinite ease-in-out, color-shift 1.5s infinite; }
+
+        /* Mouse follower effect - black and white */
+        .mouse-follower {
+            position: absolute;
+            font-size: 10px;
+            pointer-events: none;
+            animation: float 3s infinite ease-in-out;
+            opacity: 0.7;
+            z-index: 1;
+            color: white;
+            text-shadow: 0 0 3px white;
+        }
+
+        /* Footer */
+        .footer {
+            font-size: 12px;
+            opacity: 0.7;
+            padding: 15px;
+            text-align: center;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 10;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .ascii-art {
+                font-size: 22px;
+                line-height: 22px;
+            }
+            
+            button {
+                padding: 14px 16px;
+                font-size: 16px;
+                min-width: 110px;
+            }
+            
+            .controls {
+                gap: 10px;
+                padding: 20px 10px;
+                margin: 15px 0;
+            }
+            
+            .ascii-container {
+                padding: 30px 0 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                overflow-x: hidden;
+                padding-bottom: 50px; /* Уменьшенный отступ для футера */
+            }
+            
+            .ascii-art {
+                font-size: 18px;
+                line-height: 18px;
+            }
+            
+            button {
+                padding: 10px 8px;
+                font-size: 14px;
+                min-width: 70px;
+                flex: 1 1 calc(50% - 10px); /* Кнопки в 2 колонки */
+                max-width: calc(50% - 10px);
+            }
+            
+            .controls {
+                gap: 8px;
+                padding: 15px 10px;
+                margin: 10px 0 30px; /* Увеличен нижний отступ */
+                position: relative;
+                top: -20px; /* Поднимаем блок кнопок выше */
+            }
+            
+            .main-content {
+                padding: 10px 0;
+                justify-content: flex-start; /* Изменено для лучшего позиционирования */
+            }
+            
+            .footer {
+                padding: 10px 5px;
+                font-size: 11px;
+            }
+            
+            .ascii-container {
+                padding: 20px 0 15px;
+                margin-bottom: 10px; /* Уменьшен отступ снизу */
+            }
+        }
+
+        /* Sound toggle styles */
+        .sound-toggle .icon {
+            display: inline-block;
+            width: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button class="sound-toggle" onclick="toggleSound()">
+            <span class="icon">🔊</span>
+            <span class="text">Sound: ON</span>
+        </button>
+    </div>
+
+    <div class="main-content">
+        <div class="ascii-container">
+            <div class="ascii-art" id="character">
+                ╔══════════╗
+                │   ^   ^   │
+                │     ▽     │
+                │  ╭─────╮  │
+                ╚══╧     ╧══╝
+            </div>
+        </div>
+
+        <div class="controls">
+            <button onclick="setMood('happy')">Happy</button>
+            <button onclick="setMood('dancing')">Dance</button>
+            <button onclick="setMood('sleeping')">Sleep</button>
+            <button onclick="setMood('glowing')">Glow</button>
+            <button onclick="setMood('angry')">Angry</button>
+            <button onclick="setMood('spinning')">Spin</button>
+            <button onclick="setMood('surprised')">Surprise</button>
+            <button onclick="setMood('love')">Love</button>
+        </div>
+    </div>
+
+    <div class="footer">
+        ASCII Emotions © 2025
+    </div>
+
+    <script>
+        // Audio context handling
+        let audioContext;
+        let soundEnabled = true;
+        let currentSound = null;
+        const character = document.getElementById('character');
+        const soundToggle = document.querySelector('.sound-toggle');
+        let currentAnimation = null;
+        let mouseX = 0;
+        let mouseY = 0;
+        let followers = [];
+
+        // New reliable sound effects
+        const sounds = {
+            happy: 'https://www.soundjay.com/human/sounds/applause-01.mp3',
+            dancing: 'https://www.soundjay.com/mechanical/sounds/coin-drop-01.mp3',
+            sleeping: 'https://www.soundjay.com/nature/sounds/crickets-01.mp3',
+            glowing: 'https://www.soundjay.com/magic/sounds/magic-chime-01.mp3',
+            angry: 'https://www.soundjay.com/human/sounds/growl-01.mp3',
+            spinning: 'https://www.soundjay.com/mechanical/sounds/spinner-01.mp3',
+            surprised: 'https://www.soundjay.com/buttons/sounds/button-10.mp3',
+            love: 'https://www.soundjay.com/buttons/sounds/button-09.mp3'
+        };
+
+        // Initialize audio context
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                document.body.addEventListener('click', initAudio, { once: true });
+            }
+        }
+
+        // Sound toggle function
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            updateSoundToggle();
+            
+            if (!soundEnabled && currentSound) {
+                currentSound.pause();
+                currentSound.currentTime = 0;
+            }
+        }
+
+        function updateSoundToggle() {
+            const icon = soundToggle.querySelector('.icon');
+            const text = soundToggle.querySelector('.text');
+            
+            if (soundEnabled) {
+                icon.textContent = '🔊';
+                text.textContent = 'Sound: ON';
+            } else {
+                icon.textContent = '🔇';
+                text.textContent = 'Sound: OFF';
+            }
+        }
+
+        // Play sound with HTML5 Audio as fallback
+        function playSound(url) {
+            if (!soundEnabled) return;
+            
+            // First try Web Audio API
+            try {
+                initAudio();
+                if (currentSound) {
+                    currentSound.stop();
+                }
+                
+                fetch(url)
+                    .then(response => response.arrayBuffer())
+                    .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+                    .then(audioBuffer => {
+                        const source = audioContext.createBufferSource();
+                        source.buffer = audioBuffer;
+                        source.connect(audioContext.destination);
+                        source.start(0);
+                        currentSound = source;
+                    })
+                    .catch(e => {
+                        console.log("Web Audio failed, falling back to HTML5 Audio");
+                        playHTML5Audio(url);
+                    });
+            } catch (e) {
+                console.log("Web Audio not supported, using HTML5 Audio");
+                playHTML5Audio(url);
+            }
+        }
+
+        // Fallback HTML5 Audio player
+        function playHTML5Audio(url) {
+            const audio = new Audio(url);
+            audio.volume = 0.7;
+            audio.play().catch(e => console.log("Audio play failed:", e));
+            return audio;
+        }
+
+        // Mood changer function
+        function setMood(mood) {
+            if (currentAnimation) {
+                character.classList.remove(currentAnimation);
+            }
+            
+            character.classList.add(mood);
+            currentAnimation = mood;
+            
+            // Play sound effect if enabled
+            if (soundEnabled && sounds[mood]) {
+                playSound(sounds[mood]);
+            }
+            
+            // Change ASCII art based on mood
+            switch(mood) {
+                case 'happy':
+                    character.innerHTML = `╔══════════╗
+│   ^   ^   │
+│     ▽     │
+│  ╭─────╮  │
+╚══╧     ╧══╝`;
+                    break;
+                    
+                case 'dancing':
+                    character.innerHTML = `╔══════════╗
+│   O   O   │
+│    ><     │
+│  ╭╯   ╰╮  │
+╚══╧     ╧══╝`;
+                    break;
+                    
+                case 'sleeping':
+                    character.innerHTML = `╔══════════╗
+│   -   -   │
+│     ▽     │
+│  ╭~~~~~╮  │
+╚══╧     ╧══╝`;
+                    break;
+                    
+                case 'glowing':
+                    character.innerHTML = `╔══════════╗
+│   *   *   │
+│    ✧✧✧    │
+│  ╭─────╮  │
+╚══╧     ╧══╝`;
+                    break;
+                    
+                case 'angry':
+                    character.innerHTML = `╔══════════╗
+│   >   <   │
+│    ▴▴▴    │
+│  ╭─────╮  │
+╚══╧     ╧══╝`;
+                    break;
+                    
+                case 'spinning':
+                    character.innerHTML = `╔══════════╗
+│   @   @   │
+│    ◍◍◍    │
+│  ╭─────╮  │
+╚══╧     ╧══╝`;
+                    break;
+                    
+                case 'surprised':
+                    character.innerHTML = `╔══════════╗
+│   O   O   │
+│    ▵▵▵    │
+│  ╭─────╮  │
+╚══╧     ╧══╝`;
+                    break;
+                    
+                case 'love':
+                    character.innerHTML = `╔══════════╗
+│   ♥   ♥   │
+│    ♡♡♡    │
+│  ╭─────╮  │
+╚══╧     ╧══╝`;
+                    break;
+            }
+        }
+
+        // Mouse following effect
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            if (Math.random() > 0.8) {
+                createFollower();
+            }
+        });
+
+        function createFollower() {
+            const follower = document.createElement('div');
+            follower.className = 'mouse-follower';
+            const symbols = ['*', '+', '·', '○', '✧', '❂', '✺', '♥', '♡'];
+            follower.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+            follower.style.left = `${mouseX + (Math.random() * 40 - 20)}px`;
+            follower.style.top = `${mouseY + (Math.random() * 40 - 20)}px`;
+            follower.style.fontSize = `${Math.random() * 8 + 8}px`;
+            document.body.appendChild(follower);
+            
+            followers.push(follower);
+            
+            setTimeout(() => {
+                follower.remove();
+                followers = followers.filter(f => f !== follower);
+            }, 2000);
+        }
+
+        // Click interaction
+        character.addEventListener('click', () => {
+            const moods = ['happy', 'dancing', 'sleeping', 'glowing', 'angry', 'spinning', 'surprised', 'love'];
+            const randomMood = moods[Math.floor(Math.random() * moods.length)];
+            setMood(randomMood);
+            
+            for (let i = 0; i < 10; i++) {
+                setTimeout(createFollower, i * 50);
+            }
+        });
+
+        // Touch support for mobile devices
+        character.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            character.style.transform = 'scale(0.95)';
+        });
+
+        character.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            character.style.transform = 'scale(1)';
+            const moods = ['happy', 'dancing', 'sleeping', 'glowing', 'angry', 'spinning', 'surprised', 'love'];
+            const randomMood = moods[Math.floor(Math.random() * moods.length)];
+            setMood(randomMood);
+            
+            mouseX = e.changedTouches[0].clientX;
+            mouseY = e.changedTouches[0].clientY;
+            for (let i = 0; i < 8; i++) {
+                setTimeout(createFollower, i * 50);
+            }
+        });
+
+        // Prevent horizontal scroll
+        document.addEventListener('touchmove', function(e) {
+            if (e.touches.length === 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Initialize
+        updateSoundToggle();
+        setMood('happy');
+
+        // Random auto-animation every 10 seconds
+        setInterval(() => {
+            const moods = ['happy', 'dancing', 'sleeping', 'glowing', 'angry', 'spinning', 'surprised', 'love'];
+            const randomMood = moods[Math.floor(Math.random() * moods.length)];
+            setMood(randomMood);
+        }, 10000);
+    </script>
+</body>
+</html>
